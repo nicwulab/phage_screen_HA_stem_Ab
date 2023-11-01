@@ -4,7 +4,7 @@
 - [x] Integration of Fastq files
 - [x] Flank sequence trim
 - [x] Removal of redundancy and marking of duplications
-- [ ] Top list for the AntiBody 
+- [x] Top list for the AntiBody 
 - [ ] Blast analysis of L/H chain
 - [ ] Removal of low-quality bases in L/H region
 - [x] Counting of reads
