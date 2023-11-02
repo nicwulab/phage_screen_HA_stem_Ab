@@ -1,2 +1,2 @@
 Fastq /home/wenhaoo2/Collaborations/Tomas_Huan_Phage/fastq/P0_Ab_input_F3R3-bc01_fw-bc01_rev.fastq /home/wenhaoo2/Collaborations/Tomas_Huan_Phage/fastq/P2_cm_F4R4-bc02_fw-bc02_rev.fastq /home/wenhaoo2/Collaborations/Tomas_Huan_Phage/fastq/P2_wt_F5R5-bc03_fw-bc03_rev.fastq /home/wenhaoo2/Collaborations/Tomas_Huan_Phage/fastq/P3_cm_F6R6-bc04_fw-bc04_rev.fastq /home/wenhaoo2/Collaborations/Tomas_Huan_Phage/fastq/P3_wt_F7R7-bc05_fw-bc05_rev.fastq 
-OUTPUT = /home/wenkanl2/PacBio
+OUTPUT = /home/wenkanl2/miniHA_Abs_Phage_Screen/PacBio

@@ -75,30 +75,3 @@ ExpRe = ExpRe.sort_values('exp', ascending=False)
 ExpRe.to_csv('Result/ExpRe.csv')
 with open("Result/ExpRe_100_list.txt", 'w') as f:
     f.write("\n".join([str(i) for i in ExpRe.ID.unique()[:100]]))
-
-
-'''
-Result = []
-x = [10, 20, 30]
-for ID in ID_lst:
-    y = Get_ratoi(ID, 'cm')
-    fit = np.polyfit(x, np.log(y), 1)
-    print(np.exp(fit[0]))
-    Result += [[ID, 'cm', np.exp(fit[0])] ]
-    y = Get_ratoi(ID, 'wt')
-    fit = np.polyfit(x, np.log(y), 1)
-    print(np.exp(fit[0]))
-    Result += [[ID, 'wt', np.exp(fit[0])] ]
-       
-
-y = [1, 2, 3]
-#y = [1, 10, 20]
-#view the output of the model
-print(fit)
-
-
-X = np.array(range(x[0],x[-1]+1))
-plt.scatter(x, y)
-plt.plot(X, (np.exp(fit[0])**X) * np.exp(fit[1]))
-plt.show()
-'''

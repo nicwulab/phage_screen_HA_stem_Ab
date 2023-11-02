@@ -6,7 +6,6 @@
 - [x] Removal of redundancy and marking of duplications
 - [x] Top list for the AntiBody 
 - [x] Blast analysis of L/H chain
-- [ ] Removal of low-quality bases in L/H region
 - [x] Counting of reads
 - [ ] Analysis of variations
 - [x] exponential regression
@@ -104,6 +103,8 @@ Analysis complete, result file: Result/clean.tsv.gz
 ```
 Result: 6.2G tsv file
 
+# Families
 
+![](Picture/Family_all_bar.png)
 
 
