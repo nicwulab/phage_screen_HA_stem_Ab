@@ -28,7 +28,7 @@ seqkit rmdup $OUT/HeadTail_out.fq  -s -i -o $OUT/clean.fastqc.gz -D Result/dupli
 grep "^@P"  $OUT/HeadTail_out.fq | sed 's/@//'| awk -F"-" '{print $1}'|sort |uniq -c | awk '{print "Total",$2,$1}' > Result/Counts_total.csv
 
 # Count the uniq
-zgrep "^@P"  $OUT/clean.fastq.gz | sed 's/@//'| awk -F"-" '{print $1}'|sort |uniq -c | awk '{print "Unique",$2,$1}' > Result/Counts_uniq.csv
+zgrep "^@P"  $OUT/clean.fastqc.gz | sed 's/@//'| awk -F"-" '{print $1}'|sort |uniq -c | awk '{print "Unique",$2,$1}' > Result/Counts_uniq.csv
 
 
 # Count the duplicated part
@@ -48,3 +48,13 @@ done
 for i in $(cat Result/Wt_100_list.txt Result/Cm_100_list.txt | sort|uniq| sort -n); do
     grep -A1 $(awk -v NUM=$(echo $i+1|bc) 'NR==NUM' Result/duplicates.txt | awk '{print $2}'| sed 's/,//') ../PacBio/HeadTail_out.fq | sed "s/^@/>$i:/" >> CmWt_Top100.fa &
 done
+
+
+# blast the link seq
+seqkit fq2fa ../PacBio/clean.fastqc.gz -o ../PacBio/clean.fa
+blastn -query linker.fa -out blast.out -db ../PacBio/blastdb/All -outfmt "6 qacc sacc evalue sstart send" -evalue 1e-5 -max_target_seqs 1156158 -num_threads 60 -max_hsps 1
+python scripts/split_fq.py 
+
+
+# blast
+pyir -m 60  ../PacBio/clean_split.fa --outfmt tsv -o Result/clean

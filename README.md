@@ -5,10 +5,12 @@
 - [x] Flank sequence trim
 - [x] Removal of redundancy and marking of duplications
 - [x] Top list for the AntiBody 
-- [ ] Blast analysis of L/H chain
+- [x] Blast analysis of L/H chain
 - [ ] Removal of low-quality bases in L/H region
 - [x] Counting of reads
 - [ ] Analysis of variations
+- [x] exponential regression
+- [ ] wt and cm co-association
 
 
 # Integration
@@ -77,5 +79,31 @@ Trimmed:  1,764,710
 # ratio matrix
 
 ![](Picture/First_100_bar.png)
+
+# Find the link sequence
+
+`ttctagataattaattaggaggaatttaaaatgaaatacctattgcctacggcagccgctggattgttattactcgctgcccaaccagccatggcc`
+Found the link sequence in 1154584 reads from 1156148 reads.
+
+# split the reads 
+
+split the reads into up & down independent sequences if the link sequences if the link is found. If not, keep the full sequence.
+
+Result: 2310732 sequence in library
+
+# blast the reads to the IG library
+
+```
+Splitting input fasta file ../PacBio/clean_split.fa
+2,245,021 sequences successfully split into 2310 pieces
+Starting process pool using 62 processors
+2310723seq [44:49, 859.14seq/s]                              
+2,245,021 sequences processed in 2,695.56 seconds, 832 sequences / s
+Zipping up final output
+Analysis complete, result file: Result/clean.tsv.gz
+```
+Result: 6.2G tsv file
+
+
 
 
