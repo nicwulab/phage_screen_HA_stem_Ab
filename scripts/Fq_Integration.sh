@@ -44,3 +44,7 @@ python3 scripts/counts_cal.py
 for i in $(cat Result/ExpRe_100_list.txt  Result/Ratio_100_list.txt | sort|uniq); do
     grep -A1 $(awk -v NUM=$(echo $i+1|bc) 'NR==NUM' Result/duplicates.txt | awk '{print $2}'| sed 's/,//') ../PacBio/HeadTail_out.fq | sed "s/^@/>$i:/" >> Top_list.fa &
 done
+
+for i in $(cat Result/Wt_100_list.txt Result/Cm_100_list.txt | sort|uniq| sort -n); do
+    grep -A1 $(awk -v NUM=$(echo $i+1|bc) 'NR==NUM' Result/duplicates.txt | awk '{print $2}'| sed 's/,//') ../PacBio/HeadTail_out.fq | sed "s/^@/>$i:/" >> CmWt_Top100.fa &
+done
