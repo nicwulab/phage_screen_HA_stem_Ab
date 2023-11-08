@@ -24,6 +24,14 @@ rm untri* trimmed* head_out.fq
 # Mark the duplicated reads
 seqkit rmdup $OUT/HeadTail_out.fq  -s -i -o $OUT/clean.fastqc.gz -D Result/duplicates.txt
 
+## extained the duplicatoin into long matrix
+awk -F'\t' '{print $2}' Result/duplicates.txt| grep -n .| awk -F':' '{gsub(/:/,X,$NF); num=split($NF, array,", ");for(i=0;i<=num;i++){print $1-1, array[i]}}'| awk '$2!=""' > Result/ID_reads.txt
+### assign ID for all reads
+grep ">" PacBio/clean.fa| sed 's/>//'| grep -n . | sed 's/:/ /'| awk '{print $1+81065,$2}' >> Result/ID_reads.txt 
+## remove duplicated
+awk '!seen[$2]++' Result/ID_reads.txt > test.tsv
+mv test.tsv Result/ID_reads.txt 
+
 # Counts Total
 grep "^@P"  $OUT/HeadTail_out.fq | sed 's/@//'| awk -F"-" '{print $1}'|sort |uniq -c | awk '{print "Total",$2,$1}' > Result/Counts_total.csv
 
@@ -80,3 +88,40 @@ zcat $OUT/clean.tsv.gz $OUT/Duplicated.tsv.gz | awk -F'\t' '{print $10,$1}'|sed 
 
 # Plot the family counts
 Rscript C_class_plot.R
+
+
+# extract the sequence based on their families
+# zcat PacBio/clean.tsv.gz > $OUT/HV1-69_domain_all.tsv
+# zcat PacBio/clean.tsv.gz | awk -F"\t" '$95=="IGHV1-69"' >> $OUT/HV1-69_domain_all.tsv # the domain from the 
+# zcat PacBio/Duplicated.tsv.gz | awk -F"\t" '$95=="IGHV1-69"' >> Result/HV1-69/HV1-69_domain_all.tsv
+
+zcat PacBio/clean.tsv.gz | awk -F"\t" '$95=="IGHV1-69"{print ">"$1"\n"$23}' > $OUT/HV1-69_domain.fa # the domain from the 
+zcat PacBio/clean.tsv.gz | awk -F"\t" '$95=="IGHV1-69"{print ">"$1"\n"$2}' > $OUT/HV1-69_split.fa # the main part for this seq
+
+
+# for complit seuquence
+zcat PacBio/clean.tsv.gz | awk  -F"\t" '$95=="IGHV1-69"{print $1}'| sed 's/_dn//;s/_up//'  > Result/IGHV1-69.list
+seqkit grep -f Result/IGHV1-69.list $OUT/HeadTail_out.fa -o $OUT/IGHV1-69_uniq_complete.fa
+
+
+# Top 100 HV1-69
+zcat PacBio/Duplicated.tsv.gz | awk  -F"\t" '$95=="IGHV1-69"{print $1}'| sed 's/_dn//;s/_up//'  > Result/IGHV1-69_duplic.list
+cat Result/IGHV1-69_duplic.list Result/IGHV1-69.list | awk '{print "N "$1}'| sort| uniq > Result/IGHV1-69_all.list
+
+cat Result/IGHV1-69_all.list Result/ID_reads.txt  | awk 'seen[$2]++'| awk -F '-' '{print $1}'| sort| uniq -c| awk '{print $1,$2,$3}'| sort -n -r > Result/IGHV1-69_ReadsID_counts.csv
+
+for i in $(cat Result/IGHV1-69_Alltop104.list ); do grep "^$i " Result/ID_reads.txt | head -n 1 ;done | awk '{print $2}'> tmp
+seqkit grep -f tmp $OUT/HeadTail_out.fa -o $OUT/IGHV1-69_Alltop104.fa
+# add the ID at the head of each seq
+for i in $(grep ">" PacBio/IGHV1-69_Alltop104.fa | sed 's/>//'); do TMP=$(grep $i Result/ID_reads.txt|head -n 1); ID=$(echo $TMP| awk '{print $1}'); echo $ID $i; sed -i "s=$i=$ID:$i=" PacBio/IGHV1-69_Alltop104.fa;done 
+
+
+zcat PacBio/clean.tsv.gz | head -n 1 > test.tsv
+zgrep -E $(cat tmp | tr "\n" "|"| sed 's/|$/\n/') PacBio/clean.tsv.gz >> test.tsv
+
+
+## SeqLogo
+
+python scripts/Seq_log_from_tsv.py
+weblogo -s large --format png < test.fa >  Result/HV1-69/cap.png
+

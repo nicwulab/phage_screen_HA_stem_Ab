@@ -108,3 +108,5 @@ Result: 6.2G tsv file
 ![](Picture/Family_all_bar.png)
 
 
+# Seqlogo
+![](Result/HV1-69/cap.png)
