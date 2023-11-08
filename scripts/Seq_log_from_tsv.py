@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
-import seqlogo
 
+Family = 'HV1-69'
 
-TB = pd.read_table("Result/HV1-69/HV1-69_domain_all.tsv", sep ='\t')
-TB = TB[TB.v_germline_start <= 1]
+TB = pd.read_table("Result/HV1-69/IGHV1-69.tsv", sep ='\t')
+
+TB = TB[TB.v_family== "IG"+Family]
+#TB = TB[TB.v_germline_start <= 1]
 #TB2 = TB[TB.v_germline_start.isin([1,3,5])]
 
 Seq = TB[[  "sequence_alignment_aa", 

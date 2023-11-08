@@ -45,27 +45,5 @@ if __name__ == '__main__':  # This check is necessary on Windows
 
 # Flatten the list of results and combine them into one list
 Result = [item for sublist in results for item in sublist]
-'''
-# Now Result contains all the results
-
-Result  = []
-N = 0
-for id in Du_dic.keys():
-    N+=1
-    print(N)
-    TMP = df[df.sequence_id== id]
-    if len(TMP) !=0:
-        TMP_lst = [[ii] + i[0][1:].tolist() for i,ii in zip([TMP.to_numpy()] * Rep, ID_du_lst)]
-    else:
-        ID_du_lst = Du_dic[id]
-        Rep = len(ID_du_lst)
-        tmp1  = df[df.sequence_id== id + "_up"]
-        tmp2  = df[df.sequence_id== id + "_dn"]
-        tmp_l1 = [[ii+"_up"] + i[0][1:].tolist() for i,ii in zip([tmp1.to_numpy()] * Rep, ID_du_lst)]
-        tmp_l2 = [[ii+"_dn"] + i[0][1:].tolist() for i,ii in zip([tmp2.to_numpy()] * Rep, ID_du_lst)]
-        TMP_lst = tmp_l1 + tmp_l2
-    Result +=[]
 
 
-
-'''
