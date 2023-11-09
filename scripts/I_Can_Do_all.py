@@ -10,16 +10,18 @@ parser.add_argument('-i','-I','--input',nargs='+', help =
 parser.add_argument('-o','-O','--output', help= 'Please remember that the output is a directory')
 
 # For some other parameters
-parser.add_argument('-fv','-FV','--vfamily', nargs='?')
+parser.add_argument('-fv','-FV','--vfamily', nargs='+', default= None)
+parser.add_argument('-l','-L','--locus', nargs='+', default= None)
 parser.add_argument('-t','-T','--top', nargs='?', type = int)
-parser.add_argument('-s','-S','--sample', nargs='?')
-parser.add_argument('-p','-P','--pstage', nargs='?')
+parser.add_argument('-s','-S','--sample', nargs='+', default= None)
+parser.add_argument('-p','-P','--pstage', nargs='+', default= None)
 
 args = parser.parse_args()
 INPUT = args.input
 OUTPUT = args.output
 
 
+LOCUS = args.locus
 VFAMILY = args.vfamily
 TOP = args.top
 SAMPLE = args.sample
@@ -28,6 +30,11 @@ STAGE = args.pstage
 import pandas as pd
 import os
 import numpy as np
+
+def OUTPUT_update(OUTPUT):
+    OUTPUT += "/" + "_".join([i + "_" + str(Filter_dic[i]) for i in Filter_dic]) + "/" 
+    OUTPUT = OUTPUT.replace("'", '').replace('[', "").replace("]", "").replace(" ", "")
+    return OUTPUT
 
 def Read_Inputs(INPUT):
     '''
@@ -43,28 +50,46 @@ def Read_Inputs(INPUT):
     return pd.concat([TB, tmp], axis=1)
 
 def Filtering(TB, filter_lst, Filter_dic):
-    for i in filter_lst:
-        if i not in ['TOP']:
-            TB = TB[TB[i] ==  Filter_dic[i]]
+    for key in filter_lst:
+        if key not in ['TOP']:
+            TB = TB[TB[key].isin(Filter_dic[key])]
     return TB
 
 def Quality_fl(TB_f, L = 60, G_start = 10):
     TB_f = TB_f[TB_f.v_germline_start <= G_start]
     TB_f = TB_f[[len(i) >= L for i in TB_f.v_germline_alignment_aa]]
     return TB_f
-    
+
+def TOP_get(TB_f, TOP):
+    Counts = pd.read_table("Result/ID_reads.txt", sep = ' ', header=None)
+    Counts.columns = ['ID', 'Reads']
+    Counts = Counts[Counts.Reads.isin(TB_f.Reads)]
+
+    C_TB = Counts.ID.value_counts()
+    Counts['Counts'] = 1
+    ID_lst = Counts.ID.unique()
+    for id in ID_lst:
+        Counts.Counts[Counts.ID == id] = C_TB[id]
+    Counts['ratio'] = Counts.Counts / len(Counts)
+    Counts = Counts[~Counts.ID.duplicated()]
+    Counts =  Counts.sort_values('ratio', ascending=False)
+    Counts = Counts.head(TOP)
+    return Counts 
+
+
 Log = []
 
 # 
 # Collect the Filtering
-Filter_dic = {"v_family": VFAMILY,
+Filter_dic = {"locus": LOCUS,
+              "v_family": VFAMILY,
               "TOP": TOP,
               "Stage": STAGE,
               "Sample": SAMPLE}
 
 filter_lst = [i for i in Filter_dic if Filter_dic[i] != None]
 
-OUTPUT += "/" + "_".join([i + "_" + str(Filter_dic[i]) for i in Filter_dic]) + "/" 
+OUTPUT = OUTPUT_update(OUTPUT)
 
 if not os.path.exists(OUTPUT):
     os.makedirs(OUTPUT)
@@ -85,20 +110,15 @@ Log += ["Number of Seq after filtering by quality: " + str(len(TB_f))]
 TB_f['Reads'] = [i.replace("_dn", '').replace("_up", '') for i in TB_f.sequence_id]
 
 
-if i == 'TOP':
-    Counts = pd.read_table("Result/ID_reads.txt", sep = ' ', header=None)
-    Counts.columns = ['ID', 'Reads']
-    Counts = Counts[Counts.Reads.isin(TB_f.Reads)]
-
-    C_TB = Counts.ID.value_counts()
-    C_np = Counts.to_numpy()
-    Count_lst = [[C_np[i][0], C_np[i][1].split('_')[0],  C_np[i][1].split('_')[1].split('-')[0], C_np[i][1], C_TB[C_np[i][0]]] for i in range(len(C_np)) ]
-    Counts = pd.DataFrame(Count_lst, columns= ['ID', 'Stage', 'Sample', 'Reads', 'Count'])
-
-
 
 # save the results
 TB_f.to_csv(OUTPUT + "Anno.tsv", sep = '\t')
+
+if TOP != None:
+    Counts = TOP_get(TB_f, TOP)
+    TB_f = TB_f[TB_f.Reads.isin(Counts.Reads)]
+    TB_f.to_csv(OUTPUT + "Tops.tsv", sep = '\t')
+
 
 # extract the sequences
 TB_f1 = TB_f[TB_f.v_germline_start == 1]
@@ -109,9 +129,9 @@ Max_l = np.max([len(seq) for seq in TB_f1.v_sequence_alignment_aa])
 Seq_g = TB_f1.v_germline_alignment_aa[[len(seq) for seq in TB_f1.v_sequence_alignment_aa] == Max_l].iloc[0]
 
 
-Seq1 = [[TB_f1.sequence_id.iloc[i] ,TB_f1.v_germline_alignment_aa.iloc[i]] for i in range(len(TB_f1))]
+Seq1 = [[TB_f1.sequence_id.iloc[i] ,TB_f1.v_sequence_alignment_aa.iloc[i]] for i in range(len(TB_f1))]
 # Fill the head 
-Seq2 = [[TB_f2.sequence_id.iloc[i] ,"*" * Seq_g.find(TB_f2.v_germline_alignment_aa.iloc[i][:10]) + TB_f2.v_germline_alignment_aa.iloc[i]] for i in range(len(TB_f2))]
+Seq2 = [[TB_f2.sequence_id.iloc[i] ,"*" * Seq_g.find(TB_f2.v_sequence_alignment_aa.iloc[i][:10]) + TB_f2.v_sequence_alignment_aa.iloc[i]] for i in range(len(TB_f2))]
 Seq = Seq1 + Seq2
 
 # Fill the tail

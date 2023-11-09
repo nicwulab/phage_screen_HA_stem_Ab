@@ -110,3 +110,27 @@ Result: 6.2G tsv file
 
 # Seqlogo
 ![](Result/HV1-69/cap.png)
+
+```
+options:
+  -h, --help            show this help message and exit
+  -i INPUT [INPUT ...], -I INPUT [INPUT ...], --input INPUT [INPUT ...]
+                        input the annotated blast results. It is a list. You could input the Cleared results only. But if you want
+                        to cont the ratio, please add the duplicated annotation result, too.
+  -o OUTPUT, -O OUTPUT, --output OUTPUT
+                        Please remember that the output is a directory
+  -fv VFAMILY [VFAMILY ...], -FV VFAMILY [VFAMILY ...], --vfamily VFAMILY [VFAMILY ...]
+  -t [TOP], -T [TOP], --top [TOP]
+  -s SAMPLE [SAMPLE ...], -S SAMPLE [SAMPLE ...], --sample SAMPLE [SAMPLE ...]
+  -p PSTAGE [PSTAGE ...], -P PSTAGE [PSTAGE ...], --pstage PSTAGE [PSTAGE ...]
+
+Usage:
+python scripts/I_Can_Do_all.py -i {Input annotated results}  -O '{Output directory} -s {samples} -p {stages} -t {number for top}
+
+Example:
+python scripts/I_Can_Do_all.py -i PacBio/clean.tsv.gz PacBio/Duplicated.tsv.gz  -O Result/SeqLogo -s wt cm -p P2 P3 -t 100 -f IGHV1-69 IGHV3-21
+```
+
+```bash
+python scripts/I_Can_Do_all.py -i PacBio/clean.tsv.gz PacBio/Duplicated.tsv.gz  -O Result/SeqLogo -s 'Ab'
+```
