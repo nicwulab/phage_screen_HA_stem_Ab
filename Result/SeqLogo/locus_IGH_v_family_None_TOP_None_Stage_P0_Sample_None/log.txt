@@ -1,3 +1,0 @@
-Total number of locus IGH: 1763438
-Number of Seq after filtering by parameter: 375936
-Number of Seq after filtering by quality: 369250

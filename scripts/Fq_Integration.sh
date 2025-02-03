@@ -83,12 +83,79 @@ python scri
 pyir -m 60  $OUT/Duplicated_split.fa --outfmt tsv -o $OUT/Duplicated
 
 
+# Separate the HV-chain out and Removing the domain which contains the stop codon
+zcat PacBio/clean.tsv.gz |head -n 1 > PacBio/clean_IGH.tsv
+zcat PacBio/clean.tsv.gz | awk -F'\t' '$3=="IGH"' >> PacBio/clean_IGH.tsv
+gzip PacBio/clean_IGH.tsv
+
+zcat PacBio/Duplicated.tsv.gz |head -n 1 > PacBio/duplicated_IGH.tsv
+zcat PacBio/Duplicated.tsv.gz | awk -F'\t' '$3=="IGH"' >> PacBio/duplicated_IGH.tsv
+gzip PacBio/duplicated_IGH.tsv
+
+python scripts/Remove_stopCondon_reads.py
+
+# extract the AA seq
+zcat PacBio/clean_IGH.tsv.gz | grep -v sequence_id|awk '{print ">"$1"\n"$15}' > PacBio/all_AA.fa
+zcat PacBio/duplicated_IGH.tsv.gz | grep -v sequence_id|awk '{print ">"$1"\n"$15}' >> PacBio/all_AA.fa
+# duplciation counts
+seqkit rmdup PacBio/all_AA.fa -s -i -o PacBio/duplicated_IGH_AA.fa -D Result/duplicates_IGH_AA.txt
+
+
 # family counts
 zcat $OUT/clean.tsv.gz $OUT/Duplicated.tsv.gz | awk -F'\t' '{print $10,$1}'|sed 's/IG//g'|awk -F"-m" '{print $1}'| awk '{print $2,$1}'| awk -F"*" '{print $1}'| sort| uniq -c|sort -n| awk '{print $2,$3,$1}' > Result/V_class_family_count.tsv
 
 # Plot the family counts
-Rscript C_class_plot.R
+Rscript scripts/V_class_plot.R
 
+# Seqlogo (Not KABAT number based)
+
+
+
+## Get the sequence from each 800 seq.
+zcat PacBio/clean_IGH.tsv.gz | head -1 >Result/Raondom_100.tsv
+
+zgrep -E $(awk 'NR%800==0' Result/duplicates.txt| awk '{print $2}'| sed 's/,//'|tr '\n' '|'| sed 's/|$/\n/') PacBio/clean_IGH.tsv.gz >> Result/Raondom_100.tsv
+
+
+
+
+
+## Test for regression model
+
+# ./data/epitope_all.fasta is the output file
+fasta_suffix=.fa
+fasta_prefix=./Result/
+output_prefix=./Result/cluster/
+f=Dupli_aa.fa
+name=`basename $f ".fa"`
+
+mkdir $output_prefix # add
+
+# add $fasta_prefix before $f
+for x in 0.8 
+do
+	cd-hit -i $fasta_prefix$f -o $output_prefix$name$x$fasta_suffix -c $x -M 32000 -d 0 -T 8 -n 5 -aL 0.8 -s 0.95  -uS 0.2  -sc 1 -sf 1
+done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# rest of the codes if for test only
 
 # extract the sequence based on their families
 # zcat PacBio/clean.tsv.gz > $OUT/HV1-69_domain_all.tsv

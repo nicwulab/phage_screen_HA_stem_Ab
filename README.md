@@ -11,7 +11,6 @@
 - [x] exponential regression
 - [ ] wt and cm co-association
 
-
 # Integration
 
 After integration, the total number of reads are:
@@ -103,13 +102,26 @@ Analysis complete, result file: Result/clean.tsv.gz
 ```
 Result: 6.2G tsv file
 
+# Separate the HV-chain out and Removing the domain which contains the stop codon
+
+Because we mainly focus on the Heavy chain in this stage, separated file could dramatically reducing the calculation time.
+
+critirias for filtering:
+- less than 10 aa on the head
+- aa seq longer than 60
+- no stop codon on the v-domain
+
+||Before|After|Clean|
+|:-|:-|:-|:-|
+Unique|2310724|1155627|942051|
+Duplicated| 1216025|607813|538878|
+
 # Families
 
 ![](Picture/Family_all_bar.png)
 
-
 # Seqlogo
-![](Result/HV1-69/cap.png)
+![](Picture/Kabat_all_duplicated.png)
 
 ```
 options:
@@ -134,3 +146,33 @@ python scripts/I_Can_Do_all.py -i PacBio/clean.tsv.gz PacBio/Duplicated.tsv.gz  
 ```bash
 python scripts/I_Can_Do_all.py -i PacBio/clean.tsv.gz PacBio/Duplicated.tsv.gz  -O Result/SeqLogo -s 'Ab'
 ```
+
+
+
+## Grep the overlap results for Tomas
+
+
+```bash
+
+for i in $(cat PacBio/20231110_Tomas.list ); do
+    zgrep  $i PacBio/clean.tsv.gz > tmp
+    IDS=$(awk '{print $1}' tmp | sed 's/_up//;s/_dn//'| tr '\n' ',')
+    NUM=$(wc -l tmp| awk '{print $1}')
+    COUNTS=$(awk -F"-" '{print $1}' tmp | sort|uniq -c| awk '{print $2":"$1}'| tr '\n'  ',')
+    echo -e $i"\t"$NUM"\t"$COUNTS"\t"$IDS
+done > Result/20231110_Tomas_Overlap.list
+```
+
+```bash
+
+zcat PacBio/clean_IGH.tsv.gz| head -n 1 > ../HA_Abs/Ab_epitope/data/Top_500.tsv
+zgrep -E $(head -n 500  Result/duplicates_IGH_AA.txt | awk '{print $2}'| sed 's/,//'| tr '\n' '|'| sed 's/|$/\n/') PacBio/clean_IGH.tsv.gz >> ../HA_Abs/Ab_epitope/data/Top_500.tsv
+```
+
+
+
+
+
+## Kabat Number and SeqLogo
+
+![](Picture/Kabat_all_duplicated.png)
