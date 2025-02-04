@@ -1,15 +1,13 @@
 # miniHA_Abs_Phage_Screen
 
-## General Pipeline
-- [x] Integration of Fastq files
-- [x] Flank sequence trim
-- [x] Removal of redundancy and marking of duplications
-- [x] Top list for the AntiBody 
-- [x] Blast analysis of L/H chain
-- [x] Counting of reads
-- [ ] Analysis of variations
-- [x] exponential regression
-- [ ] wt and cm co-association
+# Method
+
+Analysis of PacBio sequencing data Circular consensus sequences (CCSs) were generated from the raw subreads using SMRTLink v13.0, setting the parameters to require 99.9% accuracy and a minimum of 3 passes. CSSs in FASTQ format were parsed using the SeqIO module in BioPython and filtered based on the base calling quality score, where any read with more than five nucleotides of phred quality score <40 were removed. (I am not sure about this part, the reads we got are well processed normal fastq reads) The adapter sequences were then identified on each read and trimmed from the Fab sequences. Reads that did not have the complete adapter sequences were also removed.
+The filtered reads were then use seqkit 2.7.0 [PMC5051824] to remove convert it into fasta and remove the duplicates. Unique sequences aligned to the reference Fab sequences by blast+ 2.12.0+ [PMC2803857]. Frequency (F) of a Fab i of a given sample s was computed for each replicate as follows:
+F_(i,s)=(〖readcount〗_(i,s)+1)/(∑_s▒( 〖readcount〗_(i,s)+1))   (1)
+A pseudocount of 1 was added to each mutant to avoid division by zero in subsequent steps. We then calculate the enrichment (E) of a Fab i of a given replicate k after the phage display panning as follows:
+E_(i,k)=F_(post-selection,i,k)/F_(pre-selection,i,k)    (2)
+
 
 # Integration
 

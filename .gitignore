@@ -6,3 +6,7 @@ test
 Result/SeqLogo/
 Result/v_family_IGHV1-69_TOP_None_Stage_None_Sample_None/
 Result/Cl_AA_KABAT.csv
+Result/ID_reads.txt
+Result/HV1-69/HV1-69_domain_all.tsv
+Result/blast.out
+Result/duplicates_IGH_AA.txt
