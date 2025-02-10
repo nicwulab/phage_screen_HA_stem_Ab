@@ -1,6 +1,14 @@
 library(ggplot2)
 library(stringr)
 library(reshape2)
+library(patchwork)
+
+theme_text <- theme(axis.text = element_text(family = "Arial", face = "bold", size = 7),
+        strip.text = element_text(family = "Arial", face = "bold", size = 7),
+        axis.title = element_text(family = "Arial", face = "bold", size = 7),
+        legend.text = element_text(family = "Arial", face = "bold", size = 7),
+        legend.title = element_text(family = "Arial", face = "bold", size = 7),
+        plot.title = element_text(family = "Arial", face = "bold", size = 7, hjust = .5))
 
 TB <- read.csv('Result/V_class_family_count.tsv', sep ='', header = F)
 TB <- cbind(TB, data.frame(str_split_fixed(TB$V1, "_", 2)))
@@ -20,7 +28,6 @@ for(sample in unique(TB$X1)){
     TB$ratio[TB$X1==sample]  = TB$Count[TB$X1==sample]/Counts$V3[Counts$X1==sample]
 }
 
-
 HC <- TB[TB$V2 %in%  unique(TB$V2)[grep("HV", unique(TB$V2))],]
 LC <- TB[TB$V2 %in%  unique(TB$V2)[grep("LV", unique(TB$V2))],]
 KC <- TB[TB$V2 %in%  unique(TB$V2)[grep("KV", unique(TB$V2))],]
@@ -34,8 +41,9 @@ Enrich_cal <- function(HC){
     tmp$Count <- tmp$Count/ ct$Count
     New_TB <- rbind(New_TB, tmp)
   }
+  New_TB$V2 <- paste("IG", New_TB$V2, sep = "")
   New_TB$V2 <- factor(New_TB$V2, 
-    levels = unique(New_TB$V2[order(log(New_TB$Count), decreasing = T)]))
+    levels = sort(unique(New_TB$V2)))
   return(New_TB)
 }
 
@@ -68,21 +76,28 @@ ggplot(Enrich_cal(KC), aes(V2, log(Count), color = V1, size = ratio)) +
 ggsave("plot/KC_buble_enrichment.png", w = 8.77, h = 3.78)
 ggsave("plot/KC_buble_enrichment.svg", w = 8.77, h = 3.78)
 
-ggplot(HC[HC$Count>1,], aes(X1, ratio, fill = X2)) +
-    geom_bar(stat = 'identity', position = 'dodge')+ facet_wrap(~V2, scales = 'free_y', ncol = 15) +
-    theme_bw() 
-ggsave('plot/HV_Bar_split_enrichment.png', w = 20, h = 11)
-ggsave('plot/HV_Bar_split_enrichment.svg', w = 20, h = 11)
+# now, because there are too many entry in it, we want to do the filtering and show the most important data
 
 
-ggplot(LC[LC$Count>1,], aes(X1, ratio, fill = X2)) +
-    geom_bar(stat = 'identity', position = 'dodge')+ facet_wrap(~V2, scales = 'free_y', ncol = 15) +
-    theme_bw() 
-ggsave('plot/LV_Bar_split_enrichment.png', w = 20, h = 11)
-ggsave('plot/LV_Bar_split_enrichment.svg', w = 20, h = 11)
+TopCut <- function(HC, Thr = 25){
+  tb.r <- reshape(HC[c('V1', 'V2', 'ratio')], timevar = 'V1', idvar = c('V2'), direction = 'wide')
+  tb.r[is.na(tb.r)] <- 0
+  colnames(tb.r) <- str_remove(colnames(tb.r), "ratio.")
+  return(head(tb.r$V2[order(tb.r$P3_wt, decreasing = T)], Thr))
+}
+P1 <- ggplot(Enrich_cal(HC[HC$V2 %in% TopCut(HC),]), aes(V2, log(Count+1), color = V1, size = ratio)) + 
+  geom_point() + 
+  theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust =.5),
+    axis.title.x = element_blank()) 
+P2 <- ggplot(Enrich_cal(LC[LC$V2 %in% TopCut(LC),]), aes(V2, log(Count+1), color = V1, size = ratio)) + 
+  geom_point() + 
+  theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust =.5),
+    axis.title.x = element_blank())
+P3 <- ggplot(Enrich_cal(KC[KC$V2 %in% TopCut(KC),]), aes(V2, log(Count+1), color = V1, size = ratio)) + 
+  geom_point() + 
+  theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust =.5))
+P1/P2/P3
 
-ggplot(KC[KC$Count>1,], aes(X1, ratio, fill = X2)) +
-    geom_bar(stat = 'identity', position = 'dodge')+ facet_wrap(~V2, scales = 'free_y', ncol = 15) +
-    theme_bw() 
-ggsave('plot/KV_Bar_split_enrichment.png', w = 20, h = 11)
-ggsave('plot/KV_Bar_split_enrichment.svg', w = 20, h = 11)
+ggsave("plot/HC_buble_enrichment_top.png", w= 8.2, h = 7.76)
+ggsave("plot/HC_buble_enrichment_top.svg", w= 8.2, h = 7.76)
+
