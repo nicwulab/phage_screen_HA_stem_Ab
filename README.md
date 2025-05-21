@@ -21,6 +21,10 @@ After integration, the total number of reads are:
 | P3_cm| 397649 |
 | P3_wt| 357229 |
 
+377573 + 330712 + 310041 + 397649 + 357229 = 1778204
+
+
+
 # Flank sequence trim
 
 
