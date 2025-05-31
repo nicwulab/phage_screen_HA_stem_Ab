@@ -32,8 +32,6 @@ cbind(ChainPair_tb, ratio_tb) -> ChainPair_tb
 ChainPair_tb$P3_cmR <- ChainPair_tb$P3_cm_Ratio / ChainPair_tb$P0_Ab_Ratio
 ChainPair_tb$P3_wtR <- ChainPair_tb$P3_wt_Ratio / ChainPair_tb$P0_Ab_Ratio
 
-head(ChainPair_tb)
-
 # filter the top 20
 head(unique(ChainPair_tb$IGH),20) -> topIGH
 head(unique(ChainPair_tb$IGL),20) -> topIGL
@@ -41,7 +39,6 @@ head(unique(ChainPair_tb$IGL),20) -> topIGL
 ChainPairFilter_tb  <- ChainPair_tb[ChainPair_tb$IGH %in% topIGH & ChainPair_tb$IGL %in% topIGL,]
 
 write.csv(ChainPair_tb, 'Result/IGH_IGL_plot.csv', row.names = FALSE)
-
 
 p1 <- ggplot(ChainPairFilter_tb, aes(x = IGL, y = IGH)) +
   geom_point(aes(size = P3_cm)) +
@@ -58,5 +55,23 @@ p2 <- ggplot(ChainPairFilter_tb, aes(x = IGL, y = IGH)) +
   labs(title = "IGH-IGL Pairing", x = "IGL", y = "IGH") 
 
 p1/p2
-
 ggsave("Picture/IGH_IGL.svg", width = 10.9, height = 8.44)
+
+
+p1 <- ggplot(ChainPairFilter_tb, aes(x = IGL, y = IGH)) +
+  geom_point(aes(size = P0_Ab_Ratio)) +
+  scale_size(range = c(1, 10)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "P0: IGH-IGL Pairing", x = "IGL", y = "IGH")
+
+p2 <- ggplot(ChainPairFilter_tb, aes(x = IGL, y = IGH)) +
+  geom_point(aes(size = P3_wt_Ratio)) +
+  scale_size(range = c(1, 10)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "P3: IGH-IGL Pairing", x = "IGL", y = "IGH")
+
+
+ggsave("Picture/P0_IGH_IGL.svg", p1/p2, width = 10.9, height = 8.44)
+
