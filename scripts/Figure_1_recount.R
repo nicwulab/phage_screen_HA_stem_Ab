@@ -59,14 +59,14 @@ ggsave("Picture/IGH_IGL.svg", width = 10.9, height = 8.44)
 
 
 p1 <- ggplot(ChainPairFilter_tb, aes(x = IGL, y = IGH)) +
-  geom_point(aes(size = P0_Ab_Ratio)) +
+  geom_point(aes(size = P0_Ab)) +
   scale_size(range = c(1, 10)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(title = "P0: IGH-IGL Pairing", x = "IGL", y = "IGH")
 
 p2 <- ggplot(ChainPairFilter_tb, aes(x = IGL, y = IGH)) +
-  geom_point(aes(size = P3_wt_Ratio)) +
+  geom_point(aes(size = P3_wt)) +
   scale_size(range = c(1, 10)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
