@@ -40,19 +40,24 @@ ChainPairFilter_tb  <- ChainPair_tb[ChainPair_tb$IGH %in% topIGH & ChainPair_tb$
 
 write.csv(ChainPair_tb, 'Result/IGH_IGL_plot.csv', row.names = FALSE)
 
+# plot the graphic and make the largest point counts are 50000
 p1 <- ggplot(ChainPairFilter_tb, aes(x = IGL, y = IGH)) +
   geom_point(aes(size = P3_cm)) +
   scale_size(range = c(1, 10)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(title = "IGH-IGL Pairing", x = "IGL", y = "IGH") 
+  labs(title = "IGH-IGL Pairing", x = "IGL", y = "IGH") +
+  scale_size_continuous(limits = c(0, 60000), breaks = seq(0, 60000, by = 10000))
 
 p2 <- ggplot(ChainPairFilter_tb, aes(x = IGL, y = IGH)) +
   geom_point(aes(size = P3_wt)) +
   scale_size(range = c(1, 10)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(title = "IGH-IGL Pairing", x = "IGL", y = "IGH") 
+  labs(title = "IGH-IGL Pairing", x = "IGL", y = "IGH") +
+  scale_size_continuous(limits = c(0, 60000), breaks = seq(0, 60000, by = 10000))
+
+
 
 p1/p2
 ggsave("Picture/IGH_IGL.svg", width = 10.9, height = 8.44)
@@ -63,14 +68,16 @@ p1 <- ggplot(ChainPairFilter_tb, aes(x = IGL, y = IGH)) +
   scale_size(range = c(1, 10)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(title = "P0: IGH-IGL Pairing", x = "IGL", y = "IGH")
+  labs(title = "P0: IGH-IGL Pairing", x = "IGL", y = "IGH") +
+  scale_size_continuous(limits = c(0, 60000), breaks = seq(0, 60000, by = 10000))
 
 p2 <- ggplot(ChainPairFilter_tb, aes(x = IGL, y = IGH)) +
   geom_point(aes(size = P3_wt)) +
   scale_size(range = c(1, 10)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(title = "P3: IGH-IGL Pairing", x = "IGL", y = "IGH")
+  labs(title = "P3: IGH-IGL Pairing", x = "IGL", y = "IGH") +
+  scale_size_continuous(limits = c(0, 60000), breaks = seq(0, 60000, by = 10000))
 
 
 ggsave("Picture/P0_IGH_IGL.svg", p1/p2, width = 10.9, height = 8.44)
