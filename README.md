@@ -172,7 +172,12 @@ zgrep -E $(head -n 500  Result/duplicates_IGH_AA.txt | awk '{print $2}'| sed 's/
 ```
 
 
+## Get the top 100 for ext
 
+```bash
+zcat PacBio/clean_IGH.tsv.gz| head -n 1 > Result/Top100ForUpload.tsv
+zgrep -E $(head -n 100  Result/duplicates_IGH_AA.txt | awk '{print $2}'| sed 's/,//'| tr '\n' '|'| sed 's/|$/\n/') PacBio/clean_IGH.tsv.gz >> Result/Top100ForUpload.tsv
+```
 
 
 ## Kabat Number and SeqLogo
