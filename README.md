@@ -358,7 +358,3 @@ If using this pipeline, please cite:
 ## Contact and Support
 
 For questions or issues regarding this pipeline, please contact the development team or refer to the individual script documentation.
-
-## License
-
-[Specify license if applicable]
