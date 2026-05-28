@@ -1,8 +1,8 @@
-# MiniHA Antibody Phage Display Screening Analysis Pipeline
+# Phage Display Antibody Screening Analysis Pipeline
 
 ## Abstract
 
-This repository contains a comprehensive computational pipeline for analyzing PacBio sequencing data from phage display antibody library screening experiments. The pipeline processes raw sequencing reads, identifies and annotates antibody variable region sequences, quantifies enrichment through multiple panning rounds, and generates visualizations and statistical analyses of antibody variant frequencies. The workflow is specifically optimized for analysis of heavy chain (IGH) sequences, with particular focus on IGHV1-69 and related variable region families.
+This repository contains a comprehensive computational pipeline for analyzing PacBio sequencing data from phage display antibody library screening experiments. The pipeline processes raw sequencing reads, identifies and annotates antibody variable region sequences, quantifies enrichment through multiple panning rounds, and generates visualizations and statistical analyses of antibody variant frequencies. The workflow is specifically optimized for analysis of heavy chain (IGH) sequences.
 
 ## Overview
 
